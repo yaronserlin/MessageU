@@ -14,7 +14,7 @@ def start_server():
     try:
         server_socket = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
         host = LOCAL_HOST
-        port = read_port_from_file(PORT_FILENAME)
+        port = PORT
         server_socket.bind((host,port))
         server_socket.listen()
 
