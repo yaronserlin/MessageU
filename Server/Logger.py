@@ -3,6 +3,7 @@ import sys
 from datetime import datetime
 from enum import Enum
 import inspect
+import threading
 
 
 class LogLevel(Enum):
@@ -36,6 +37,7 @@ class Log:
         self._to_console = log_to_console
         self._logger_name = logger_name
         self._initialize_log_file(filename)
+        self._lock = threading.Lock()
 
     def _initialize_log_file(self, filename):
         if self._to_file and filename:
@@ -51,22 +53,22 @@ class Log:
             self._log_file = None
 
     def _log_message(self, level, message, file_details=None):
+        with self._lock:
+            timestamp = Log._get_timestamp()
+            level_str = LogLevel.to_string(level)
 
-        timestamp = Log._get_timestamp()
-        level_str = LogLevel.to_string(level)
+            if not file_details:
+                filename,line = self._get_caller_details()
+            else:
+                filename, line = file_details
 
-        if not file_details:
-            filename,line = self._get_caller_details()
-        else:
-            filename, line = file_details
+            log_entry = f"[{timestamp}] [{level_str}] [{filename}:{line}]\t{message} ({self._logger_name})"
 
-        log_entry = f"[{timestamp}] [{level_str}] [{filename}:{line}]\t{message} ({self._logger_name})"
+            if self._to_console:
+                self._log_to_console(log_entry, level)
 
-        if self._to_console:
-            self._log_to_console(log_entry, level)
-
-        if self._to_file and Log._log_file:
-            self._log_to_file(log_entry, level)
+            if self._to_file and Log._log_file:
+                self._log_to_file(log_entry, level)
 
     def _log_to_file(self, message, level):
         if not (level == LogLevel.DEBUG):
