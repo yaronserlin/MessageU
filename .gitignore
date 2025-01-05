@@ -4,3 +4,9 @@
 /.idea/inspectionProfiles/Project_Default.xml
 /.idea/src.iml
 /.idea/vcs.xml
+/Client/Debug
+/Client/.vs/Client/v16
+/Client/Client.sln
+/Client/Client.vcxproj
+/Client/Client.vcxproj.filters
+/Client/Client.vcxproj.user
