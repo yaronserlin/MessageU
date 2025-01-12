@@ -1,16 +1,20 @@
 #include "NetworkManager.h"
 
-NetworkManager::NetworkManager()
+//NetworkManager::_socket = tcp::socket(io_context);
+
+NetworkManager::NetworkManager() : _io_context(), _socket(_io_context)
 {
     _address = "";
-    _port = 0;
+    _port = "";
+    //_socket = tcp::socket(io_context);
+
 }
 
-NetworkManager::NetworkManager(const std::string& serverAddress, int serverPort)
-{
-    _address = serverAddress;
-    _port = serverPort;
-}
+//NetworkManager::NetworkManager(const std::string& serverAddress, std::string serverPort) : _io_context(), _socket(_io_context)
+//{
+//    _address = serverAddress;
+//    _port = serverPort;
+//}
 
 NetworkManager::~NetworkManager()
 {
@@ -21,14 +25,31 @@ std::string NetworkManager::getAddress()
     return std::string(_address);
 }
 
-int NetworkManager::getPort()
+std::string NetworkManager::getPort()
 {
     return _port;
 }
 
-bool NetworkManager::connectToServer(const std::string& serverAddress, int serverPort)
+void NetworkManager::setServerInfo(const std::string& address, const std::string& port)
 {
-    return false;
+    _address = address;
+    _port = port;
+}
+
+tcp::socket& NetworkManager::connectToServer()
+{
+    try
+    {
+        boost::asio::io_context io_context;
+        tcp::resolver resolver(io_context);
+        boost::asio::connect(_socket, resolver.resolve(_address, _port));
+
+        return _socket;
+    }
+    catch (const std::exception& e)
+    {
+        throw std::runtime_error("Connection error: " + std::string(e.what()));
+    }
 }
 
 bool NetworkManager::requestPublicKeyFromServer(const std::string& clientID)
