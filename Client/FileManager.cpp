@@ -22,11 +22,11 @@ std::vector<std::string> FileManager::readFromFile(const std::string& filePath)
     }
 }
 
-std::pair<std::string,int> FileManager::readServerInfo(const std::string & filePath)
+std::pair<std::string, std::string> FileManager::readServerInfo(const std::string & filePath)
 {   
     std::vector<std::string> lines = readFromFile(filePath);
     std::string serverAddress;
-    int port;
+    std::string port;
 
     if (lines.empty())
         throw std::runtime_error("Failed to read server info file.");
@@ -54,7 +54,7 @@ std::pair<std::string,int> FileManager::readServerInfo(const std::string & fileP
     catch (const std::out_of_range&) {
         throw std::runtime_error("Port number out of range in server info file.");
     }
-    return { serverAddress,port };
+    return { serverAddress,portStr };
 }
 
 bool FileManager::readClientData(const std::string& filePath, std::string& name, std::string& uniqueID, std::string& privateKey)
